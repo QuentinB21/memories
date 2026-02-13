@@ -16,8 +16,8 @@ const state = {
         { id: 4, src: 'photos/4.jpg', text: "C'est pas un peu paradoxale d'être giga fraiche tout en foutant le feu à la piste ? ❤️‍🔥💃🏻" },
         { id: 5, src: 'photos/5.jpg', text: "Merci d'être toi, tout simplement. <br> Je t'aime plus que les mots ne peuvent le dire ❤️ <br> Ma petite margueritte d'amour 🫠" },
         { id: 6, src: 'photos/6.jpg', text: "Guette ce regard de tueuse ! On dirai tu cherche à me tirer dessus !<br> Alors que je suis déjà tomber sous ton charme 👀" },
-        { id: 7, src: 'photos/7.png', text: "Mine de rien faire ça m'a pris un peu de temps, mais ça me plait de te faire ce genre de cadeau ❤️" },
-        { id: 8, src: 'photos/8.png', text: "C'était pas prévu au dépard, mais tu en as reparlé et du coup j'ai eu envie d'en refaire une 😉 <br> Mieux réussi je trouve, qu'est-ce que tu en dis ? 😘" },
+        { id: 7, src: 'photos/7_2.png', text: "Mine de rien faire ça m'a pris un peu de temps, mais ça me plait de te faire ce genre de cadeau ❤️" },
+        { id: 8, src: 'photos/8_2.png', text: "C'était pas prévu au dépard, mais tu en as reparlé et du coup j'ai eu envie d'en refaire une 😉 <br> Mieux réussi je trouve, qu'est-ce que tu en dis ? 😘" },
         { id: 9, src: 'photos/9.jpg', text: "Ma margueritte<br> Du matin au soir, ton doux parfum m'enivre,<br> Ecrivons notre hisoire" }
     ]
 };
