@@ -1,0 +1,574 @@
+:root {
+    --bg-color: #fdfbf7;
+    --envelope-color: #e0c9a6;
+    /* Kraft paper / soft gold feel */
+    --envelope-inner: #d4b895;
+    --envelope-flap-color: #dbc39d;
+    --envelope-front-accent: #dcc5a1;
+    --accent-color: #c0392b;
+    /* Romantic red */
+    --text-color: #2c3e50;
+    --card-bg: #fff;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --shadow-deep: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+    --envelope-width: 300px;
+    --envelope-height: 200px;
+
+    /* Animations */
+    --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: 'Playfair Display', serif;
+    overflow: hidden;
+    /* Prevent scrolling */
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1500px;
+    /* Essential for 3D */
+}
+
+/* --- Background & Effects --- */
+.background-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(240, 230, 220, 1) 100%);
+    overflow: hidden;
+}
+
+/* Floating particles/hearts could go here */
+.background-effects::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 10%, transparent 10%);
+    background-size: 50px 50px;
+    opacity: 0.1;
+    animation: moveBackground 60s linear infinite;
+}
+
+@keyframes moveBackground {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- UI Controls --- */
+.ui-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Space between counter and music btn */
+}
+
+.volume-slider {
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: width 0.25s ease, opacity 0.25s ease;
+    accent-color: var(--accent-color);
+}
+
+.ui-controls.music-on .volume-slider {
+    width: 110px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.counter {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.6);
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+.icon-btn.playing {
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Envelope Styles --- */
+
+.envelope-wrapper {
+    position: relative;
+    width: var(--envelope-width);
+    height: var(--envelope-height);
+    transform-style: preserve-3d;
+    cursor: pointer;
+    transition: transform 0.6s var(--ease-in-out);
+    z-index: 10;
+}
+
+/* Hover effect on desktop */
+.envelope-wrapper:hover {
+    transform: translateY(-5px);
+}
+
+.envelope {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* The back of the envelope (inside) */
+.envelope-back {
+
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--envelope-inner);
+    border-radius: 0 0 5px 5px;
+    box-shadow: var(--shadow-soft);
+    z-index: 1;
+    /* Lowest layout layer */
+}
+
+/* The front pocket of the envelope */
+.envelope-pocket {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 85%;
+    background-color: var(--envelope-color);
+    border-radius: 0 0 5px 5px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    z-index: 9;
+    pointer-events: none;
+}
+
+.envelope-front {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    /* Create the V shape using clip-path or borders. Using border here for classic look */
+    border-style: solid;
+    border-width: 0 150px 100px 150px;
+    /* adjust to match width/height */
+    border-color: transparent transparent var(--envelope-front-accent) transparent;
+    border-bottom-width: 110px;
+    /* Slight adjustment for overlap */
+    border-left-width: 150px;
+    border-right-width: 150px;
+    transform: translateZ(2px);
+    /* Slight lift */
+    z-index: 10;
+    /* Covers the card partially */
+    pointer-events: none;
+    /* Let clicks pass through to potential card controls if needed */
+    opacity: 0.55;
+    filter: drop-shadow(0 -1px 2px rgba(0, 0, 0, 0.03));
+}
+
+/* The top flap */
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* Triangle shape */
+    border-style: solid;
+    border-width: 110px 150px 0 150px;
+    border-color: var(--envelope-flap-color) transparent transparent transparent;
+    transform-origin: top;
+    transition: transform 0.6s 0.2s var(--ease-in-out), z-index 0.6s;
+    z-index: 11;
+    filter: drop-shadow(0 7px 10px rgba(0, 0, 0, 0.18));
+
+    /* On top of front when closed */
+}
+
+.envelope-flap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Open state for flap */
+.envelope-wrapper.is-open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+    /* Moves behind the content when open */
+    transition-delay: 0s;
+}
+
+.envelope-wrapper.is-open {
+    cursor: default;
+    /* No more pointer on envelope once open */
+    transform: translateY(15vh);
+    /* Move down slightly to give room for card */
+}
+
+/* Shadow underneath */
+.envelope-shadow {
+    position: absolute;
+    bottom: -20px;
+    left: 5%;
+    width: 90%;
+    height: 20px;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+    z-index: -1;
+    transition: opacity 0.5s;
+}
+
+/* --- Card / Photo Styles --- */
+.card-container {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 85%;
+    z-index: 5;
+    pointer-events: none;
+    /* Removed perspective here to share envelope's 3D space better */
+}
+
+.photo-card {
+    background-color: transparent;
+    border-radius: 10px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    /* Crucial for flip */
+    transition: transform 0.5s var(--ease-out-back), opacity 0.25s ease;
+    cursor: grab;
+    touch-action: none;
+    /* Prevent scrolling while dragging */
+    user-select: none;
+    /* Fix: Prevent text selection/highlighting */
+    -webkit-user-select: none;
+
+    /* Fix: Deep initial hide to prevent poking out */
+    transform: translateY(100px) scale(0.9);
+    opacity: 0;
+}
+
+.photo-card.current {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    /* Slight "settled" position */
+    z-index: 6;
+    /* Be less than front (10) */
+}
+
+/* Peek state when envelope opens */
+.envelope-wrapper.is-open .photo-card.current {
+    opacity: 1;
+    transform: translateY(-14px) scale(0.96);
+    /* Peek UP */
+    z-index: 6;
+    pointer-events: auto;
+}
+
+/* Being dragged State (JS will add this class) */
+.photo-card.is-dragging {
+    transition: none;
+    /* Remove transition for instant follow */
+    cursor: grabbing;
+}
+
+/* Pulled out State (Floating in center) */
+.photo-card.is-out {
+    position: fixed;
+    /* Target size/position is animated from JS to preserve the envelope origin */
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+
+    z-index: 1000;
+    transition: all 0.8s var(--ease-in-out);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Card Sides --- */
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    /* Hide back when front is seen */
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-front {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 10px 60px 10px;
+    /* Polaroid style bottom padding */
+    background: #fff;
+}
+
+.card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    background: #fdfbf7;
+    /* Paper texture color */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+    border: 2px solid #e0c9a6;
+}
+
+.card-back p {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Flipped State */
+.photo-card.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Flipped State - When OUT (Simplified) */
+.photo-card.is-out.is-flipped {
+    transform: rotateY(180deg);
+}
+
+
+/* --- Card Back Content --- */
+.back-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.next-btn {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    pointer-events: auto;
+    /* Ensure clickable */
+}
+
+.next-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(192, 57, 43, 0.3);
+}
+
+/* Exit Animation */
+.photo-card.is-gone {
+    transform: translate(150vw, -100vh) rotate(45deg) !important;
+    opacity: 0;
+    transition: transform 0.6s ease-in, opacity 0.6s ease-in;
+}
+
+/* End Overlay */
+.end-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s;
+    z-index: 2000;
+}
+
+.end-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.end-overlay h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 4rem;
+    width: min(92vw, 700px);
+    margin: 0 auto 20px;
+    line-height: 1.2;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    animation: float 3s ease-in-out infinite;
+}
+
+.end-overlay p {
+    width: min(92vw, 700px);
+    margin: 0 auto;
+    font-size: 1.5rem;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* --- UI Controls --- */
+.start-overlay {
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    text-align: center;
+    color: var(--text-color);
+    pointer-events: none;
+    transition: opacity 0.5s;
+    z-index: 50;
+}
+
+.start-overlay p {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.start-overlay .tap-hint {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    animation: pulse 2s infinite;
+}
+
+.envelope-wrapper.is-open~.start-overlay {
+    opacity: 0;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.4;
+    }
+}
+
+/* --- Mobile Adjustments --- */
+@media (max-width: 480px) {
+    :root {
+        --envelope-width: 85vw;
+        --envelope-height: 55vw;
+    }
+
+    .envelope-front {
+        border-width: 0 42.5vw 28vw 42.5vw;
+        border-bottom-width: 30vw;
+        border-right-width: 43vw;
+        /* slight pixel fix */
+    }
+
+    .envelope-flap {
+        border-width: 30vw 43vw 0 43vw;
+    }
+
+    .ui-controls.music-on .volume-slider {
+        width: 90px;
+    }
+
+    .end-overlay h1 {
+        font-size: 3rem;
+    }
+}
