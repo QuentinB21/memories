@@ -8,6 +8,7 @@ const state = {
     isDragging: false,
     isOutSwiping: false,
     suppressOutClick: false,
+    hintContext: 'pull',
     startY: 0,
     startX: 0,
     dragBaseY: 0,
@@ -31,6 +32,7 @@ const dom = {
     cardContainer: document.getElementById('cardContainer'),
     startOverlay: document.getElementById('startOverlay'),
     interactionHint: document.getElementById('interactionHint'),
+    helpToggle: document.getElementById('helpToggle'),
     uiControls: document.getElementById('uiControls'),
     bgMusic: document.getElementById('bgMusic'),
     musicToggle: document.getElementById('musicToggle'),
@@ -41,6 +43,7 @@ const dom = {
 function init() {
     dom.envelopeWrapper.addEventListener('click', handleEnvelopeClick);
     dom.musicToggle.addEventListener('click', toggleMusic);
+    dom.helpToggle.addEventListener('click', onHelpClick);
     dom.volumeSlider.addEventListener('input', onVolumeChange);
     dom.bgMusic.volume = Number(dom.volumeSlider.value) / 100;
     setMusicUiState(false);
@@ -62,7 +65,8 @@ function handleEnvelopeClick() {
     // Enable interaction on the first card after animation
     setTimeout(() => {
         enableCardInteraction(state.currentPhotoIndex);
-        setInteractionHint("Glisse la photo vers le haut pour la sortir ✨");
+        state.hintContext = 'pull';
+        maybeAutoShowHint();
     }, 600); // generic delay matching CSS transition
 }
 
@@ -279,7 +283,8 @@ function pullCardOut(card) {
         card.style.transform = '';
         card.style.margin = '0';
         card.style.opacity = '1';
-        setInteractionHint("Tape la photo pour la retourner. Swipe vers la droite ou clique sur \"Suivant\" pour continuer.");
+        state.hintContext = 'out';
+        maybeAutoShowHint();
     });
 }
 
@@ -323,7 +328,8 @@ function onNextClick(currentCard) {
             if (nextCard) {
                 nextCard.classList.add('current');
                 enableCardInteraction(state.currentPhotoIndex);
-                setInteractionHint("Glisse la photo vers le haut pour la sortir ✨");
+                state.hintContext = 'pull';
+                clearInteractionHint();
             }
         } else {
             // End of experience
@@ -352,6 +358,34 @@ function setInteractionHint(message) {
 function clearInteractionHint() {
     if (!dom.interactionHint) return;
     dom.interactionHint.classList.remove('visible');
+}
+
+function onHelpClick(e) {
+    e.stopPropagation();
+    const message = getCurrentHintMessage();
+    if (!message) return;
+
+    if (dom.interactionHint.classList.contains('visible')) {
+        clearInteractionHint();
+        return;
+    }
+
+    setInteractionHint(message);
+}
+
+function maybeAutoShowHint() {
+    if (state.currentPhotoIndex !== 0) {
+        clearInteractionHint();
+        return;
+    }
+    setInteractionHint(getCurrentHintMessage());
+}
+
+function getCurrentHintMessage() {
+    if (state.hintContext === 'out') {
+        return 'Tape la photo pour la retourner. Swipe vers la droite ou clique sur "Suivant" pour continuer.';
+    }
+    return 'Glisse la photo vers le haut pour la sortir ✨';
 }
 
 /* --- Audio & Haptics --- */

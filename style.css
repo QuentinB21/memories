@@ -137,6 +137,13 @@ body {
     align-items: center;
 }
 
+.help-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    opacity: 0.75;
+}
+
 .icon-btn:hover {
     transform: scale(1.1);
     background: #fff;
@@ -563,7 +570,8 @@ body {
     bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
-    max-width: min(90vw, 520px);
+    width: min(85vw, 400px);
+    max-width: none;
     padding: 10px 14px;
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.86);
