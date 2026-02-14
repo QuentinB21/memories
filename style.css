@@ -567,7 +567,7 @@ body {
 
 .interaction-hint {
     position: absolute;
-    bottom: 32px;
+    bottom: clamp(76px, 14vh, 140px);
     left: 50%;
     transform: translateX(-50%);
     width: min(85vw, 400px);
@@ -634,7 +634,7 @@ body {
     }
 
     .interaction-hint {
-        bottom: 20px;
+        bottom: clamp(60px, 12vh, 95px);
         font-size: 0.88rem;
         padding: 9px 12px;
     }
