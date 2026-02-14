@@ -303,6 +303,7 @@ body {
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
     /* Crucial for flip */
     transition: transform 0.5s var(--ease-out-back), opacity 0.25s ease;
     cursor: grab;
@@ -315,6 +316,14 @@ body {
     /* Fix: Deep initial hide to prevent poking out */
     transform: translateY(100px) scale(0.9);
     opacity: 0;
+}
+
+.card-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.6s var(--ease-in-out);
 }
 
 .photo-card.current {
@@ -360,7 +369,6 @@ body {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    /* Hide back when front is seen */
     border-radius: 10px;
     overflow: hidden;
     background: #fff;
@@ -382,6 +390,24 @@ body {
     object-fit: cover;
     border-radius: 4px;
     pointer-events: none;
+}
+
+.card-front-note {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    margin: 0;
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 0.95rem;
+    color: rgba(44, 62, 80, 0.72);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .card-back {
@@ -532,6 +558,29 @@ body {
     opacity: 0;
 }
 
+.interaction-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: min(90vw, 520px);
+    padding: 10px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    color: var(--text-color);
+    font-size: 0.95rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.interaction-hint.visible {
+    opacity: 1;
+}
+
 @keyframes pulse {
     0% {
         opacity: 0.4;
@@ -570,5 +619,15 @@ body {
 
     .end-overlay h1 {
         font-size: 3rem;
+    }
+
+    .card-front-note {
+        font-size: 0.85rem;
+    }
+
+    .interaction-hint {
+        bottom: 20px;
+        font-size: 0.88rem;
+        padding: 9px 12px;
     }
 }

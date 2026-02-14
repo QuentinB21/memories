@@ -13,15 +13,15 @@ const state = {
     dragBaseY: 0,
     currentY: 0,
     photos: [
-        { id: 1, src: 'photos/1.jpg', text: "Le pantalon qui ni survivera pas... 👖 <br>Un oreillé aussi touché au combat 👀 <br><br> (Tap pour retourner)" },
-        { id: 2, src: 'photos/2.jpg', text: "Askip c'est un coeur ❤️ <br> Ce qui est sûr c'est que le mien est à toi 😉" },
-        { id: 3, src: 'photos/3.jpg', text: "Je t'ai déjà dit à quel point tu es magnifique ? <br> Dans le doute, je te le redis 😘" },
-        { id: 4, src: 'photos/4.jpg', text: "C'est pas un peu paradoxale d'être giga fraiche tout en foutant le feu à la piste ? ❤️‍🔥💃🏻" },
-        { id: 5, src: 'photos/5.jpg', text: "Merci d'être toi, tout simplement. <br> Je t'aime plus que les mots ne peuvent le dire ❤️ <br> Ma petite margueritte d'amour 🫠" },
-        { id: 6, src: 'photos/6.jpg', text: "Guette ce regard de tueuse ! On dirai tu cherche à me tirer dessus !<br> Alors que je suis déjà tomber sous ton charme 👀" },
-        { id: 7, src: 'photos/7.png', text: "Mine de rien faire ça m'a pris un peu de temps, mais ça me plait de te faire ce genre de cadeau ❤️" },
-        { id: 8, src: 'photos/8.png', text: "C'était pas prévu au dépard, mais j'ai eu envie d'en refaire une 😉 <br> Mieux réussi tu ne trouve pas  ? 😘" },
-        { id: 9, src: 'photos/9.jpg', text: "Ma margueritte<br> Du matin au soir, ton doux parfum m'enivre,<br> Ecrivons notre hisoire" }
+        { id: 1, src: 'photos/1.jpg', frontNote: '01/02/2026', text: "Le pantalon qui ni survivera pas... 👖 <br>Un oreillé aussi sera touché au combat 👀 <br><br> (Tap pour retourner)" },
+        { id: 2, src: 'photos/2.jpg', frontNote: '01/02/2026', text: "Askip c'est un coeur ❤️ <br> Ce qui est sûr c'est que le mien est à toi 😉" },
+        { id: 3, src: 'photos/3.jpg', frontNote: '19/01/2026', text: "Je t'ai déjà dit à quel point tu es magnifique ? <br> Dans le doute, je te le redis 😘" },
+        { id: 4, src: 'photos/4.jpg', frontNote: '08/02/2026', text: "C'est pas un peu paradoxale d'être giga fraiche tout en foutant le feu à la piste ? ❤️‍🔥💃🏻" },
+        { id: 5, src: 'photos/5.jpg', frontNote: '25/01/2026', text: "Merci d'être toi, tout simplement. <br> Je t'aime plus que les mots ne peuvent le dire ❤️ <br> Ma petite margueritte d'amour 🫠" },
+        { id: 6, src: 'photos/6.jpg', frontNote: '25/01/2026', text: "Guette ce regard de tueuse ! On dirai tu cherche à me tirer dessus !<br> Alors que je suis déjà tomber sous ton charme 👀" },
+        { id: 7, src: 'photos/7.png', frontNote: '16/12/2025', text: "Mine de rien, ça m'a pris un peu de temps à la faire, mais ça me plait de te faire ce genre de cadeau ❤️" },
+        { id: 8, src: 'photos/8.png', frontNote: '13/02/2026', text: "C'était pas prévu au dépard, mais j'ai eu envie d'en refaire une 😉 <br> Mieux réussi tu ne trouve pas  ? 😘" },
+        { id: 9, src: 'photos/9.jpg', frontNote: '01/02/2026', text: "Bref, tout ça pour dire que je t'aime super fort" }
     ]
 };
 const PEEK_SCALE = 0.96;
@@ -30,6 +30,7 @@ const dom = {
     envelopeWrapper: document.getElementById('envelopeWrapper'),
     cardContainer: document.getElementById('cardContainer'),
     startOverlay: document.getElementById('startOverlay'),
+    interactionHint: document.getElementById('interactionHint'),
     uiControls: document.getElementById('uiControls'),
     bgMusic: document.getElementById('bgMusic'),
     musicToggle: document.getElementById('musicToggle'),
@@ -61,6 +62,7 @@ function handleEnvelopeClick() {
     // Enable interaction on the first card after animation
     setTimeout(() => {
         enableCardInteraction(state.currentPhotoIndex);
+        setInteractionHint("Glisse la photo vers le haut pour la sortir ✨");
     }, 600); // generic delay matching CSS transition
 }
 
@@ -76,6 +78,9 @@ function renderCards() {
 
         card.dataset.index = index;
 
+        const cardInner = document.createElement('div');
+        cardInner.className = 'card-inner';
+
         // Front Side
         const front = document.createElement('div');
         front.className = 'card-face card-front';
@@ -83,6 +88,11 @@ function renderCards() {
         img.src = photo.src;
         img.alt = "Souvenir";
         front.appendChild(img);
+
+        const frontNote = document.createElement('p');
+        frontNote.className = 'card-front-note';
+        frontNote.textContent = photo.frontNote || '';
+        front.appendChild(frontNote);
 
         // Back Side
         const back = document.createElement('div');
@@ -111,8 +121,9 @@ function renderCards() {
 
         back.appendChild(contentHelper);
 
-        card.appendChild(front);
-        card.appendChild(back);
+        cardInner.appendChild(front);
+        cardInner.appendChild(back);
+        card.appendChild(cardInner);
 
         dom.cardContainer.appendChild(card);
     });
@@ -150,6 +161,11 @@ function enableCardInteraction(index) {
 function onPointerDown(e) {
     const card = e.currentTarget;
     if (card.classList.contains('is-out')) {
+        // Let interactive controls (next button) receive normal clicks/taps.
+        if (e.target.closest('.next-btn')) {
+            return;
+        }
+
         state.isOutSwiping = true;
         state.startX = e.clientX;
         state.startY = e.clientY;
@@ -263,6 +279,7 @@ function pullCardOut(card) {
         card.style.transform = '';
         card.style.margin = '0';
         card.style.opacity = '1';
+        setInteractionHint("Tape la photo pour la retourner. Swipe vers la droite ou clique sur \"Suivant\" pour continuer.");
     });
 }
 
@@ -306,6 +323,7 @@ function onNextClick(currentCard) {
             if (nextCard) {
                 nextCard.classList.add('current');
                 enableCardInteraction(state.currentPhotoIndex);
+                setInteractionHint("Glisse la photo vers le haut pour la sortir ✨");
             }
         } else {
             // End of experience
@@ -319,9 +337,21 @@ function showEndScreen() {
     overlay.className = 'end-overlay';
     overlay.innerHTML = "<h1>Joyeuse St Valentin ❤️</h1><p>Je t'aime.</p>";
     document.body.appendChild(overlay);
+    clearInteractionHint();
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 100);
+}
+
+function setInteractionHint(message) {
+    if (!dom.interactionHint) return;
+    dom.interactionHint.textContent = message;
+    dom.interactionHint.classList.add('visible');
+}
+
+function clearInteractionHint() {
+    if (!dom.interactionHint) return;
+    dom.interactionHint.classList.remove('visible');
 }
 
 /* --- Audio & Haptics --- */
